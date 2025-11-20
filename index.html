@@ -260,7 +260,7 @@
         🧹 مسح الكل
       </button>
       <button id="undoBtn" class="btn btn-outline">
-        ↩️ تراجع
+        ↩️ الرجوع لآخر نسخة
       </button>
     </div>
 
@@ -834,19 +834,37 @@
       }
 
       function undoClear() {
-        if (!previousSnapshot) {
-          showStatus("لا يوجد إجراء يمكن التراجع عنه حالياً.", "error");
+        const stored = localStorage.getItem(STORAGE_KEY);
+      
+        // 1) لو في Snapshot من مسح الكل → رجّعها
+        if (previousSnapshot) {
+          setFormData(previousSnapshot);
+          try {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(previousSnapshot));
+          } catch (e) {
+            console.error("Error restoring snapshot:", e);
+          }
+          showStatus("تم استرجاع آخر بيانات قبل المسح.", "success");
+          previousSnapshot = null;
           return;
         }
-        setFormData(previousSnapshot);
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(previousSnapshot));
-        } catch (e) {
-          console.error("Error restoring snapshot:", e);
+      
+        // 2) لو مفيش Snapshot لكن في نسخة محفوظة في localStorage → رجّعها
+        if (stored) {
+          try {
+            const data = JSON.parse(stored);
+            setFormData(data);
+            showStatus("تم الرجوع لآخر نسخة محفوظة من البيانات.", "success");
+            return;
+          } catch (e) {
+            console.error("Error parsing stored data:", e);
+          }
         }
-        showStatus("تم استرجاع آخر بيانات قبل المسح.", "success");
-        previousSnapshot = null;
+      
+        // 3) مفيش حاجة نرجع لها
+        showStatus("لا يوجد إجراء يمكن التراجع عنه حالياً.", "error");
       }
+
 
       function showStatus(message, type) {
         if (!statusEl) return;
