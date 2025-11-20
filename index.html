@@ -766,7 +766,64 @@
   </div>
 
   <script>
-    (function () {
+  (function () {
+      // =========================
+      // 1) قراءة اسم المتجر من الـ URL
+      // =========================
+      const urlParams = new URLSearchParams(window.location.search);
+      const rawStoreName =
+        urlParams.get("utm_store_name") ||
+        urlParams.get("utm_store") ||
+        urlParams.get("store");
+
+      const STORE_NAME = rawStoreName ? rawStoreName.trim() : "";
+
+      // =========================
+      // 2) تطبيق اسم المتجر في النصوص
+      // =========================
+      function applyStoreName() {
+        if (!STORE_NAME) return;
+
+        // تعديل عنوان الهيدر
+        const headerTitle = document.querySelector("header h1");
+        if (headerTitle) {
+          headerTitle.textContent = "نموذج معلومات " + STORE_NAME;
+        }
+
+        // استبدال كلمة "متجرك" و "المتجر" في كل النصوص (ما عدا الـ <script> و <style>)
+        const walker = document.createTreeWalker(
+          document.body,
+          NodeFilter.SHOW_TEXT,
+          null
+        );
+
+        let node;
+        while ((node = walker.nextNode())) {
+          if (!node.nodeValue || !node.nodeValue.trim()) continue;
+
+          let text = node.nodeValue;
+          text = text.replace(/متجرك/g, STORE_NAME);
+          text = text.replace(/المتجر/g, STORE_NAME);
+          node.nodeValue = text;
+        }
+
+        // استبدال الاسم داخل الـ placeholders (Hazel Store / متجرك / المتجر)
+        document.querySelectorAll("textarea").forEach((el) => {
+          if (!el.placeholder) return;
+          let p = el.placeholder;
+          p = p.replace(/Hazel Store/g, STORE_NAME);
+          p = p.replace(/متجرك/g, STORE_NAME);
+          p = p.replace(/المتجر/g, STORE_NAME);
+          el.placeholder = p;
+        });
+      }
+
+      // نطبّق التخصيص مباشرة بعد تحميل الـ DOM
+      document.addEventListener("DOMContentLoaded", applyStoreName);
+
+      // =========================
+      // 3) باقي كود الفورم (حفظ / تراجع / PDF)
+      // =========================
       const STORAGE_KEY = "hazel_store_brand_form_v1";
       const statusEl = document.getElementById("statusMessage");
       const saveBtn = document.getElementById("saveBtn");
@@ -774,9 +831,7 @@
       const clearBtn = document.getElementById("clearBtn");
       const undoBtn = document.getElementById("undoBtn");
 
-      const fields = Array.from(
-        document.querySelectorAll("[data-field]")
-      );
+      const fields = Array.from(document.querySelectorAll("[data-field]"));
 
       let previousSnapshot = null; // لحفظ آخر حالة قبل المسح
 
@@ -821,7 +876,10 @@
           }
         } catch (e) {
           console.error("Error saving form:", e);
-          showStatus("تعذر حفظ البيانات. تأكد من مساحة التخزين في المتصفح.", "error");
+          showStatus(
+            "تعذر حفظ البيانات. تأكد من مساحة التخزين في المتصفح.",
+            "error"
+          );
         }
       }
 
@@ -835,7 +893,7 @@
 
       function undoClear() {
         const stored = localStorage.getItem(STORAGE_KEY);
-      
+
         // 1) لو في Snapshot من مسح الكل → رجّعها
         if (previousSnapshot) {
           setFormData(previousSnapshot);
@@ -848,7 +906,7 @@
           previousSnapshot = null;
           return;
         }
-      
+
         // 2) لو مفيش Snapshot لكن في نسخة محفوظة في localStorage → رجّعها
         if (stored) {
           try {
@@ -860,11 +918,10 @@
             console.error("Error parsing stored data:", e);
           }
         }
-      
+
         // 3) مفيش حاجة نرجع لها
         showStatus("لا يوجد إجراء يمكن التراجع عنه حالياً.", "error");
       }
-
 
       function showStatus(message, type) {
         if (!statusEl) return;
@@ -951,6 +1008,6 @@
       setupAccordions();
       loadForm();
     })();
-  </script>
+</script>
 </body>
 </html>
