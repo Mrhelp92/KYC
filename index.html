@@ -402,7 +402,7 @@
             "عدساتنا مصنوعة بتقنية مريحة للعين وتدوم أكثر بثلاث أضعاف العدسات التقليدية"
           </blockquote>
           <label class="section-label" for="q5_usp">
-            اكتب الميزة التنافسية (USP) لـ Hazel Store في سطر واحد:
+            اكتب الميزة التنافسية (USP) لـ متجرك في سطر واحد:
           </label>
           <textarea id="q5_usp" data-field="q5_usp" placeholder="جملة تسويقية قوية تلخص الميزة الأساسية لمتجرك..."></textarea>
         </div>
@@ -824,7 +824,13 @@
       // =========================
       // 3) باقي كود الفورم (حفظ / تراجع / PDF)
       // =========================
-      const STORAGE_KEY = "hazel_store_brand_form_v1";
+      const STORAGE_KEY_BASE = "hazel_store_brand_form_v1";
+      
+      // نخلي مفتاح التخزين مرتبط باسم المتجر من الـ URL
+      const STORAGE_KEY = STORE_NAME
+        ? STORAGE_KEY_BASE + "_" + encodeURIComponent(STORE_NAME)
+        : STORAGE_KEY_BASE;
+
       const statusEl = document.getElementById("statusMessage");
       const saveBtn = document.getElementById("saveBtn");
       const exportBtn = document.getElementById("exportBtn");
