@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>نموذج معلومات Hazel Store</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Tahoma, sans-serif;
+      background: #f5f5f7;
+      color: #222;
+      line-height: 1.6;
+    }
+
+    .page-wrapper {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #4c2b63;
+    }
+
+    header p {
+      margin: 0;
+      color: #555;
+      font-size: 0.95rem;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0 24px;
+    }
+
+    .btn {
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: #4c2b63;
+      color: #fff;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-primary:hover {
+      background: #61337f;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-outline {
+      background: #fff;
+      color: #4c2b63;
+      border: 1px solid #ccb9dd;
+    }
+
+    .btn-outline:hover {
+      background: #f5edf9;
+      transform: translateY(-1px);
+    }
+
+    .status-message {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #2e7d32;
+      min-height: 1.2em;
+      margin-bottom: 8px;
+    }
+
+    .accordion-item {
+      background: #fff;
+      border-radius: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      overflow: hidden;
+      border: 1px solid #ece6f2;
+    }
+
+    .accordion-header {
+      padding: 14px 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #faf7ff;
+    }
+
+    .accordion-title {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .accordion-title span.main-title {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #3b244a;
+    }
+
+    .accordion-title span.subtitle {
+      font-size: 0.8rem;
+      color: #777;
+    }
+
+    .accordion-icon {
+      font-size: 1.2rem;
+      transition: transform 0.2s ease;
+    }
+
+    .accordion-item.open .accordion-icon {
+      transform: rotate(90deg);
+    }
+
+    .accordion-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.25s ease;
+      padding: 0 16px;
+    }
+
+    .accordion-inner {
+      padding: 10px 0 18px;
+      border-top: 1px solid #f0eaf7;
+    }
+
+    .helper-text {
+      font-size: 0.9rem;
+      color: #555;
+      margin-bottom: 6px;
+    }
+
+    blockquote {
+      border-right: 3px solid #d1c4e9;
+      margin: 0 0 8px;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      color: #555;
+      background: #fbf8ff;
+      border-radius: 8px;
+    }
+
+    label.section-label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin: 8px 0 4px;
+      color: #3b244a;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 80px;
+      resize: vertical;
+      border-radius: 10px;
+      border: 1px solid #d1c4e9;
+      padding: 8px 10px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      outline: none;
+      background: #fcfbff;
+      transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s;
+    }
+
+    textarea:focus {
+      border-color: #4c2b63;
+      box-shadow: 0 0 0 2px rgba(76, 43, 99, 0.15);
+      background: #fff;
+    }
+
+    .note {
+      font-size: 0.85rem;
+      color: #777;
+      margin-top: 4px;
+    }
+
+    @media (max-width: 768px) {
+      .page-wrapper {
+        padding: 16px 10px 32px;
+      }
+
+      header h1 {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* طباعة / PDF */
+    @media print {
+      body {
+        background: #fff;
+      }
+
+      .toolbar,
+      .status-message {
+        display: none !important;
+      }
+
+      .accordion-item {
+        box-shadow: none;
+        border: 1px solid #ccc;
+        page-break-inside: avoid;
+      }
+
+      .accordion-content {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+
+      .accordion-inner {
+        border-top: none;
+      }
+
+      header {
+        margin-bottom: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrapper">
+    <header>
+      <h1>نموذج معلومات المتجر – Hazel Store</h1>
+      <p>جاوب على الأسئلة بهدوء، وتقدر تحفظ وترجع تكمل في أي وقت من نفس الجهاز.</p>
+    </header>
+
+    <div class="toolbar">
+      <button id="saveBtn" class="btn btn-primary">
+        💾 حفظ واستكمال لاحقاً
+      </button>
+      <button id="exportBtn" class="btn btn-outline">
+        📄 تصدير كملف PDF
+      </button>
+      <button id="clearBtn" class="btn btn-outline">
+        🧹 مسح الكل
+      </button>
+      <button id="undoBtn" class="btn btn-outline">
+        ↩️ تراجع
+      </button>
+    </div>
+
+    <div class="status-message" id="statusMessage"></div>
+
+    <!-- 🚀 1. خطاب المصعد -->
+    <section class="accordion-item open">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">🚀 1. خطاب المصعد (Elevator Pitch)</span>
+          <span class="subtitle">خلاصة Hazel Store في 30 ثانية</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            تخيل أنا وأنت في مصعد بيأخذ 30 ثانية عشان يوصل للطابق اللي نبغاه،
+            <br>
+            <em>عرّفني عن متجرك واقنعني أنه متجر استثنائي قبل لا نوصل.</em>
+          </blockquote>
+
+          <label class="section-label" for="q1_name">وش اسم متجرك؟</label>
+          <textarea id="q1_name" data-field="q1_name" placeholder="مثال: Hazel Store ..."></textarea>
+
+          <label class="section-label" for="q1_offer">وش تقدم بالضبط؟</label>
+          <textarea id="q1_offer" data-field="q1_offer" placeholder="وصف مختصر للمنتجات / الخدمات اللي تقدمها..."></textarea>
+
+          <label class="section-label" for="q1_whybuy">ليش الناس يشترون منك؟</label>
+          <textarea id="q1_whybuy" data-field="q1_whybuy" placeholder="اكتب السبب الرئيسي اللي يخلي العميل يختارك..."></textarea>
+
+          <label class="section-label" for="q1_unique">إيش الشيء اللي يخليك تتميز عن أي متجر ثاني؟</label>
+          <textarea id="q1_unique" data-field="q1_unique" placeholder="الفرق الجوهري أو النقطة المميزة في Hazel Store..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🔖 2. ليش سويت ماركة خاصة فيك؟ -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">🔖 2. ليش سويت ماركة خاصة فيك؟</span>
+          <span class="subtitle">الدافع خلف إنشاء البراند الخاص</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            بدل ما تبيع ماركات موجودة بالسوق من الوكيل، إيش اللي خلاك تتجه إنك تصنع براندك الخاص؟<br>
+            هل كان عندك هدف معين؟ هل فيه شي ما عجبك في الموجود بالسوق؟
+          </blockquote>
+          <label class="section-label" for="q2_reason">
+            اشرح ليش سويت ماركتك الخاصة، وأي هدف أو مشكلة في السوق كنت تبغى تحلّها:
+          </label>
+          <textarea id="q2_reason" data-field="q2_reason" placeholder="وضّح الدافع الرئيسي لإنشاء البراند الخاص فيك..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 📅 3. من متى بدأ المتجر؟ -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">📅 3. من متى بدأ المتجر؟ وكم له سنة؟</span>
+          <span class="subtitle">بداية Hazel Store وطريقة تشغيله</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          
+          <label class="section-label" for="q3_started">
+            من متى بدأ المتجر؟ وكم له تقريبًا؟
+          </label>
+          <textarea id="q3_started" data-field="q3_started" placeholder="اكتب سنة أو تاريخ البداية، ومدة عمل Hazel Store..."></textarea>
+
+          <label class="section-label" for="q3_work_mode">
+            تشتغل عليه دوام كامل أو جزئي؟ وعندك فريق أو تعمل لوحدك؟
+          </label>
+          <textarea id="q3_work_mode" data-field="q3_work_mode" placeholder="اشرح طريقة عملك وترتيب فريقك (لو موجود)..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🧩 4. قصة المتجر أو البراند -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">🧩 4. قصة المتجر أو البراند</span>
+          <span class="subtitle">القصة اللي خلتك تبدأ Hazel Store</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            قولّي قصة عنك أو عن متجرك أو البراند: كيف بدأت الفكرة وتحوّلت لمشروع حالي.
+          </blockquote>
+
+          <label class="section-label" for="q4_story">
+            وش القصة اللي خلتك تقرر تبدأ المتجر؟
+          </label>
+          <textarea id="q4_story" data-field="q4_story" placeholder="احكي لنا بداية الفكرة وكيف تحولت لمتجر فعلي..."></textarea>
+
+          <label class="section-label" for="q4_products_reason">
+            ليش قررت تبيع هذا النوع من المنتجات؟
+          </label>
+          <textarea id="q4_products_reason" data-field="q4_products_reason" placeholder="سبب اختيارك لهذا النوع من المنتجات بالذات..."></textarea>
+
+          <label class="section-label" for="q4_event">
+            هل واجهت موقف خلاك تبدأ؟
+          </label>
+          <textarea id="q4_event" data-field="q4_event" placeholder="لو فيه موقف معيّن أثّر عليك وخلّاك تبدأ، احكيه هنا..."></textarea>
+
+          <label class="section-label" for="q4_market_problem">
+            هل كنت تحل مشكلة موجودة بالسوق؟
+          </label>
+          <textarea id="q4_market_problem" data-field="q4_market_problem" placeholder="وصف للمشكلة الموجودة في السوق وكيف متجرك يحلّها..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🏆 5. الميزة التنافسية (USP) -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">🏆 5. الميزة التنافسية (USP)</span>
+          <span class="subtitle">سطر واحد يشرح ليش Hazel Store مختلف</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            ما  التنافسية اللي تفرقك عن غيرك؟<br>
+            <em>اكتبها كأنك تروج لها في إعلان – سطر واحد مغري وجاذب.</em><br>
+            مثال توضيحي:<br>
+            "عدساتنا مصنوعة بتقنية مريحة للعين وتدوم أكثر بثلاث أضعاف العدسات التقليدية"
+          </blockquote>
+          <label class="section-label" for="q5_usp">
+            اكتب الميزة التنافسية (USP) لـ Hazel Store في سطر واحد:
+          </label>
+          <textarea id="q5_usp" data-field="q5_usp" placeholder="جملة تسويقية قوية تلخص الميزة الأساسية لمتجرك..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 📦 6. أكثر المنتجات مبيعًا -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">📦 6. أكثر المنتجات مبيعًا</span>
+          <span class="subtitle">المنتجات الأساسية والموسمية عندك</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            ما هو المنتج الأكثر مبيعًا؟ ولو فيه أكثر من منتج، اذكرهم بالترتيب من الأعلى مبيعًا، مع المنتجات الموسمية والتي عليها طلب دائم.
+          </blockquote>
+
+          <label class="section-label" for="q6_top_products">
+            ما هو المنتج الأكثر مبيعًا؟ (أو المنتجات مرتبة من الأعلى مبيعًا):
+          </label>
+          <textarea id="q6_top_products" data-field="q6_top_products" placeholder="اكتب أسماء المنتجات الأكثر مبيعًا بالترتيب..."></textarea>
+
+          <label class="section-label" for="q6_seasonal">
+            هل فيه منتجات موسمية؟ اذكرها:
+          </label>
+          <textarea id="q6_seasonal" data-field="q6_seasonal" placeholder="المنتجات المرتبطة بمواسم أو مناسبات معينة..."></textarea>
+
+          <label class="section-label" for="q6_constant_demand">
+            وش اللي عليه طلب دائم؟
+          </label>
+          <textarea id="q6_constant_demand" data-field="q6_constant_demand" placeholder="المنتجات اللي عليها طلب ثابت طول السنة..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🎯 7. الفئة المستهدفة بالتفصيل -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">🎯 7. الفئة المستهدفة بالتفصيل</span>
+          <span class="subtitle">مين أكثر ناس يشترون منك؟</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            صف لنا عميلك المثالي من ناحية العمر، الدخل، المدينة، الاهتمامات، أسلوب الحياة، والتطبيقات اللي يستخدمها وطريقة شرائه.
+          </blockquote>
+
+          <label class="section-label" for="q7_demo">
+            العمر، الجنس، الحالة الاجتماعية:
+          </label>
+          <textarea id="q7_demo" data-field="q7_demo" placeholder="مثال: نساء 20-35، عازبات أو متزوجات..."></textarea>
+
+          <label class="section-label" for="q7_income">
+            الوظيفة أو الدخل التقريبي:
+          </label>
+          <textarea id="q7_income" data-field="q7_income" placeholder="نوع الوظائف أو مستوى الدخل الغالب لدى عملائك..."></textarea>
+
+          <label class="section-label" for="q7_cities">
+            المدن اللي يتواجدون فيها:
+          </label>
+          <textarea id="q7_cities" data-field="q7_cities" placeholder="أهم المدن أو المناطق اللي يجيك منها طلبات..."></textarea>
+
+          <label class="section-label" for="q7_interests">
+            اهتماماتهم (الجمال، الموضة، التصوير...):
+          </label>
+          <textarea id="q7_interests" data-field="q7_interests" placeholder="اكتب اهتمامات أو هوايات عامة عند عملائك..."></textarea>
+
+          <label class="section-label" for="q7_lifestyle">
+            ثقافتهم أو أسلوب حياتهم:
+          </label>
+          <textarea id="q7_lifestyle" data-field="q7_lifestyle" placeholder="وصف لأسلوب حياتهم: محافظ، عملي، فاخر، رياضي..."></textarea>
+
+          <label class="section-label" for="q7_apps">
+            هل يستخدمون تطبيقات معينة؟ مثل إنستغرام، سناب، تيك توك؟
+          </label>
+          <textarea id="q7_apps" data-field="q7_apps" placeholder="اذكر أهم التطبيقات ومنصات السوشيال اللي يتفاعلون فيها..."></textarea>
+
+          <label class="section-label" for="q7_channels">
+            هل يقرأون إيميلات؟ يدخلون على المواقع أو يشترون من إنستغرام؟
+          </label>
+          <textarea id="q7_channels" data-field="q7_channels" placeholder="سلوكهم في الشراء والتصفح (موقع، إنستغرام، واتساب..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🔍 8. ستة معلومات أو حقائق مثيرة -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">🔍 8. ستة معلومات أو حقائق مثيرة تبغى العميل يعرفها عنك</span>
+          <span class="subtitle">أشياء حلوة ومختلفة عن Hazel Store</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            خذ راحتك، اذكر 6 أشياء مميزة عن متجرك، عنك، عن الخدمة أو عن تجربة الشراء.
+          </blockquote>
+          <label class="section-label" for="q8_facts">
+            اذكر 6 معلومات أو حقائق مميزة عن Hazel Store:
+          </label>
+          <textarea id="q8_facts" data-field="q8_facts" placeholder="تقدر تكتبها كنقاط (1..6) أو فقرات قصيرة..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ❓ 9. أكثر 6 أسئلة تتكرر من عملاءك -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">❓ 9. أكثر 6 أسئلة تتكرر من عملاءك</span>
+          <span class="subtitle">الأسئلة المتكررة وأسبابها</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            إيش الأسئلة اللي الناس دايمًا تسألها؟ وليش تعتقد إنها تتكرر؟<br><br>
+            هل السبب قلة توضيح؟ عدم فهم المنتج؟ أو أشياء في المتجر نفسه؟
+          </blockquote>
+          <label class="section-label" for="q9_faq">
+            اكتب أكثر 6 أسئلة تتكرر من عملاءك، وتحليلك لسبب تكرارها:
+          </label>
+          <textarea id="q9_faq" data-field="q9_faq" placeholder="مثال: سؤال عن التوصيل، الاسترجاع، الجودة... مع توضيح سبب تكرار كل سؤال"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🌀 10. أكثر الأمور اللي تلخبط العملاء -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">🌀 10. أكثر الأمور اللي تلخبط العملاء</span>
+          <span class="subtitle">نقاط الغموض في تجربة الشراء</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            اذكر لنا الأمور اللي تشوف إنها تصعب على العميل فهم المنتج أو الاختيار، سواء في المقاسات، الألوان، طريقة الطلب أو المصطلحات.
+          </blockquote>
+
+          <label class="section-label" for="q10_sizes">
+            هل فيه لبس في المقاسات أو الألوان؟
+          </label>
+          <textarea id="q10_sizes" data-field="q10_sizes" placeholder="لو فيه مشاكل في فهم المقاسات أو الألوان، وضّحها هنا..."></textarea>
+
+          <label class="section-label" for="q10_checkout">
+            هل طريقة الطلب معقدة شوي؟
+          </label>
+          <textarea id="q10_checkout" data-field="q10_checkout" placeholder="اذكر لو خطوات الشراء أو السلة أو الدفع تسبب لخبطة..."></textarea>
+
+          <label class="section-label" for="q10_terms">
+            هل بعض المصطلحات الطبية أو الجمالية ما تنفهم بسهولة؟
+          </label>
+          <textarea id="q10_terms" data-field="q10_terms" placeholder="اكتب أي مصطلحات أو معلومات تحتاج تبسيط أكثر للعميل..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🤔 11. هل الزبائن يحسبونك زي أي متجر ثاني؟ -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">🤔 11. هل الزبائن يحسبونك زي أي متجر ثاني؟</span>
+          <span class="subtitle">صورة Hazel Store في ذهن العميل</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            هل واجهت مواقف يحسبون أنك مثل المنافسين؟ لو نعم، حاول تشرح السبب، وبالمقابل وش يخليك مختلف فعلًا.
+          </blockquote>
+
+          <label class="section-label" for="q11_like_others">
+            إذا الزبائن يحسبونك زي أي متجر ثاني، وش السبب في رأيك؟
+          </label>
+          <textarea id="q11_like_others" data-field="q11_like_others" placeholder="اكتب الانطباعات أو المواقف اللي حسّيت فيها إنهم شايفينك عادي..."></textarea>
+
+          <label class="section-label" for="q11_difference">
+            وش اللي يخليك مختلف فعلًا عنهم؟
+          </label>
+          <textarea id="q11_difference" data-field="q11_difference" placeholder="اكتب بوضوح نقاط الاختلاف اللي حاب تبرزها..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- ✅ 12. اعتمادات ومصداقية -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">✅ 12. هل عندك اعتمادات أو أشياء تدعم المصداقية؟</span>
+          <span class="subtitle">ما يثبت ثقة Hazel Store</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            مثل: سجل تجاري، شهادات جودة، شراكات مع جهات موثوقة، توثيق حسابات في منصات معينة، أو تقييمات ومراجعات قوية.
+          </blockquote>
+          <label class="section-label" for="q12_trust">
+            اذكر الاعتمادات والأشياء اللي تدعم مصداقيتك:
+          </label>
+          <textarea id="q12_trust" data-field="q12_trust" placeholder="سجل تجاري، شهادات، شراكات، توثيق، تقييمات... اكتبها هنا بالتفصيل"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🆚 13. من هم منافسيك في السوق؟ -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">🆚 13. من هم منافسيك في السوق؟</span>
+          <span class="subtitle">تحليل منافسين Hazel Store</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            اذكر منافسيك المباشرين وروابطهم، وسبب اعتبارك لهم منافسين، وأين تشعر أنهم أفضل، وماذا تحتاج تطور لتنافسهم بقوة.
+          </blockquote>
+
+          <label class="section-label" for="q13_competitors">
+            اذكر أسماء أو روابط مواقع منافسيك المباشرين:
+          </label>
+          <textarea id="q13_competitors" data-field="q13_competitors" placeholder="اكتب أسماء المتاجر أو روابطها..."></textarea>
+
+          <label class="section-label" for="q13_why_competitors">
+            ليش تعتبرهم منافسينك؟ (سعر، تصميم، منتج نفسه...)
+          </label>
+          <textarea id="q13_why_competitors" data-field="q13_why_competitors" placeholder="وضح أسباب اختيارك لهم كمنافسين مباشرِين..."></textarea>
+
+          <label class="section-label" for="q13_they_better">
+            هل تشوف إنهم يتفوقون عليك في شيء معين؟ وكيف؟
+          </label>
+          <textarea id="q13_they_better" data-field="q13_they_better" placeholder="اكتب المجالات اللي تحس إنهم أفضل فيها حاليًا..."></textarea>
+
+          <label class="section-label" for="q13_you_improve">
+            وش تتمنى تطور عندك علشان تتفوق عليهم أو تلحقهم؟
+          </label>
+          <textarea id="q13_you_improve" data-field="q13_you_improve" placeholder="خططك أو أفكارك للتطوير والمنافسة أقوى..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🌟 14. أكبر قصة نجاح وأكبر إحباط -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">🌟 14. أكبر قصة نجاح وأكبر إحباط</span>
+          <span class="subtitle">أهم لحظات الصعود والتحدي</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            شاركنا تجربة نجاح بارزة مرّ فيها المتجر (مبيعات، تريند، عميل مهم...)، وحدث سلبي أو إحباط واجهته وكيف تجاوزته.
+          </blockquote>
+
+          <label class="section-label" for="q14_success">
+            أكبر قصة نجاح مرت على Hazel Store:
+          </label>
+          <textarea id="q14_success" data-field="q14_success" placeholder="احكي لنا موقف نجاح مميز أو فترة قوية جدًا..."></textarea>
+
+          <label class="section-label" for="q14_failure">
+            أكبر إحباط أو حدث سلبي (وكيف تجاوزته):
+          </label>
+          <textarea id="q14_failure" data-field="q14_failure" placeholder="اكتب عن تجربة سلبية أو تحدي كبير وكيف تعاملت معه..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 📆 15. متى مواسمك القوية؟ -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">📆 15. متى مواسمك القوية؟</span>
+          <span class="subtitle">أقوى الفترات والأرقام عند Hazel Store</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            إيش أفضل وقت بالسنة تحقق فيه أعلى مبيعات، كم كانت أعلى مبيعات أو عدد طلبات، وفي أي شهر أو مناسبة كان ذلك؟
+          </blockquote>
+
+          <label class="section-label" for="q15_best_time">
+            إيش أفضل وقت بالسنة تحقق فيه أعلى مبيعات؟
+          </label>
+          <textarea id="q15_best_time" data-field="q15_best_time" placeholder="اكتب المواسم: رمضان، الأعياد، العودة للمدارس..."></textarea>
+
+          <label class="section-label" for="q15_top_numbers">
+            كم كانت أعلى مبيعات أو عدد طلبات وصلت له تقريبًا؟
+          </label>
+          <textarea id="q15_top_numbers" data-field="q15_top_numbers" placeholder="اذكر رقم تقريبي لعدد الطلبات أو قيمة المبيعات..."></textarea>
+
+          <label class="section-label" for="q15_month_event">
+            في أي شهر أو مناسبة كان هذا الرقم؟
+          </label>
+          <textarea id="q15_month_event" data-field="q15_month_event" placeholder="اذكر الشهر أو المناسبة (مثال: رمضان 2024، اليوم الوطني..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- 💬 16. كيف تتواصل مع عملاءك؟ -->
+    <section class="accordion-item">
+      <div class="accordion-header">
+        <div class="accordion-title">
+          <span class="main-title">💬 16. كيف تتواصل مع عملاءك؟</span>
+          <span class="subtitle">قنوات التواصل وسرعة الرد</span>
+        </div>
+        <span class="accordion-icon">▶</span>
+      </div>
+      <div class="accordion-content">
+        <div class="accordion-inner">
+          <blockquote>
+            هل تتواصل بنفسك أو عندك فريق؟ من أي وسيلة ترد (واتساب، إنستغرام، الإيميل...؟)، كم يستغرق الرد عادة؟ وهل تستخدم أدوات أو برامج لتنظيم خدمة العملاء؟
+          </blockquote>
+
+          <label class="section-label" for="q16_who">
+            هل تتواصل بنفسك أو عندك فريق لدعم العملاء؟
+          </label>
+          <textarea id="q16_who" data-field="q16_who" placeholder="اكتب من يتولى الرد وخدمة العملاء..."></textarea>
+
+          <label class="section-label" for="q16_channels">
+            ترد من أي وسيلة؟ (واتساب، إنستغرام، إيميل...)
+          </label>
+          <textarea id="q16_channels" data-field="q16_channels" placeholder="اذكر قنوات التواصل الأساسية اللي تستخدمها..."></textarea>
+
+          <label class="section-label" for="q16_response_time">
+            كم تأخذ وقت عادةً في الرد؟
+          </label>
+          <textarea id="q16_response_time" data-field="q16_response_time" placeholder="اكتب متوسط وقت الرد التقريبي..."></textarea>
+
+          <label class="section-label" for="q16_tools">
+            هل تستخدم أدوات تنظيم أو برامج معينة؟
+          </label>
+          <textarea id="q16_tools" data-field="q16_tools" placeholder="لو تستخدم CRM أو أدوات تذاكر أو غيرها، اذكرها هنا..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <p class="note">
+      💡 ملاحظة: يتم حفظ إجاباتك في المتصفح فقط (localStorage) لنفس الجهاز والمتصفح. لو فتحت الرابط من جهاز ثاني، ما راح تظهر البيانات.
+    </p>
+  </div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = "hazel_store_brand_form_v1";
+      const statusEl = document.getElementById("statusMessage");
+      const saveBtn = document.getElementById("saveBtn");
+      const exportBtn = document.getElementById("exportBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const undoBtn = document.getElementById("undoBtn");
+
+      const fields = Array.from(
+        document.querySelectorAll("[data-field]")
+      );
+
+      let previousSnapshot = null; // لحفظ آخر حالة قبل المسح
+
+      function getFormData() {
+        const data = {};
+        fields.forEach((el) => {
+          data[el.dataset.field] = el.value || "";
+        });
+        return data;
+      }
+
+      function setFormData(data) {
+        fields.forEach((el) => {
+          const key = el.dataset.field;
+          if (data[key] !== undefined) {
+            el.value = data[key];
+          } else {
+            el.value = "";
+          }
+        });
+      }
+
+      function loadForm() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          const data = JSON.parse(raw);
+          setFormData(data);
+          showStatus("تم تحميل البيانات المحفوظة.", "success");
+        } catch (e) {
+          console.error("Error loading form:", e);
+          showStatus("تعذر تحميل البيانات المحفوظة.", "error");
+        }
+      }
+
+      function saveForm(showMsg = true) {
+        const data = getFormData();
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+          if (showMsg) {
+            showStatus("تم حفظ البيانات بنجاح ✅", "success");
+          }
+        } catch (e) {
+          console.error("Error saving form:", e);
+          showStatus("تعذر حفظ البيانات. تأكد من مساحة التخزين في المتصفح.", "error");
+        }
+      }
+
+      function clearForm() {
+        // خزّن آخر حالة قبل المسح علشان التراجع
+        previousSnapshot = getFormData();
+        fields.forEach((el) => (el.value = ""));
+        localStorage.removeItem(STORAGE_KEY);
+        showStatus("تم مسح جميع الحقول. تقدر تضغط تراجع لاسترجاعها.", "success");
+      }
+
+      function undoClear() {
+        if (!previousSnapshot) {
+          showStatus("لا يوجد إجراء يمكن التراجع عنه حالياً.", "error");
+          return;
+        }
+        setFormData(previousSnapshot);
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(previousSnapshot));
+        } catch (e) {
+          console.error("Error restoring snapshot:", e);
+        }
+        showStatus("تم استرجاع آخر بيانات قبل المسح.", "success");
+        previousSnapshot = null;
+      }
+
+      function showStatus(message, type) {
+        if (!statusEl) return;
+        statusEl.textContent = message || "";
+        if (type === "error") {
+          statusEl.style.color = "#c62828";
+        } else {
+          statusEl.style.color = "#2e7d32";
+        }
+        if (message) {
+          setTimeout(() => {
+            statusEl.textContent = "";
+          }, 4000);
+        }
+      }
+
+      function toggleAccordion(item) {
+        const content = item.querySelector(".accordion-content");
+        const isOpen = item.classList.contains("open");
+
+        if (isOpen) {
+          item.classList.remove("open");
+          content.style.maxHeight = null;
+        } else {
+          item.classList.add("open");
+          content.style.maxHeight = content.scrollHeight + "px";
+        }
+      }
+
+      function setupAccordions() {
+        const items = document.querySelectorAll(".accordion-item");
+        items.forEach((item) => {
+          const header = item.querySelector(".accordion-header");
+          const content = item.querySelector(".accordion-content");
+          if (header && content) {
+            header.addEventListener("click", () => toggleAccordion(item));
+            if (item.classList.contains("open")) {
+              content.style.maxHeight = content.scrollHeight + "px";
+            }
+          }
+        });
+
+        window.addEventListener("resize", () => {
+          document
+            .querySelectorAll(".accordion-item.open .accordion-content")
+            .forEach((content) => {
+              content.style.maxHeight = content.scrollHeight + "px";
+            });
+        });
+      }
+
+      function exportToPDF() {
+        window.print();
+      }
+
+      saveBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        saveForm(true);
+      });
+
+      exportBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        saveForm(false);
+        exportToPDF();
+      });
+
+      clearBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        clearForm();
+      });
+
+      undoBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        undoClear();
+      });
+
+      // حفظ تلقائي أثناء الكتابة (بدون رسالة)
+      fields.forEach((el) => {
+        el.addEventListener("input", () => {
+          saveForm(false);
+        });
+      });
+
+      setupAccordions();
+      loadForm();
+    })();
+  </script>
+</body>
+</html>
