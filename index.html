@@ -240,6 +240,13 @@
         margin-bottom: 10px;
       }
     }
+
+    @media print {
+      .hide-on-print {
+        display: none !important;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -1013,6 +1020,41 @@
 
       setupAccordions();
       loadForm();
+
+      // ===== حل الطباعة بحيث ما يختفي النص الطويل =====
+      function prepareTextareasForPrint() {
+        document.querySelectorAll("textarea").forEach((ta) => {
+          const printed = document.createElement("div");
+          printed.className = "print-textarea";
+          printed.textContent = ta.value;
+          printed.style.whiteSpace = "pre-wrap";
+          printed.style.padding = "10px";
+          printed.style.border = "1px solid #ccc";
+          printed.style.borderRadius = "8px";
+          printed.style.minHeight = "40px";
+          printed.style.marginTop = "6px";
+          printed.style.fontSize = "0.9rem";
+          printed.style.background = "#fff";
+      
+          // إخفاء الـ textarea وقت الطباعة فقط
+          ta.classList.add("hide-on-print");
+      
+          // نحط الديف بعد التيكست ايريا
+          ta.parentNode.insertBefore(printed, ta.nextSibling);
+        });
+      }
+      
+      // إزالة الديفات بعد الطباعة
+      function cleanupPrintedTextareas() {
+        document.querySelectorAll(".print-textarea").forEach((el) => el.remove());
+        document.querySelectorAll(".hide-on-print").forEach((el) => el.classList.remove("hide-on-print"));
+      }
+      
+      // قبل الطباعة
+      window.addEventListener("beforeprint", prepareTextareasForPrint);
+      // بعد الطباعة
+      window.addEventListener("afterprint", cleanupPrintedTextareas);
+
     })();
 </script>
 </body>
